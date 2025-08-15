@@ -213,32 +213,6 @@ public class NotificationDetails implements Serializable {
     notificationDetails.id = (Integer) arguments.get(ID);
     notificationDetails.title = (String) arguments.get(TITLE);
     notificationDetails.body = (String) arguments.get(BODY);
-    Object raw = arguments.get("titleStyle");
-    if (raw instanceof Map) {
-      @SuppressWarnings("unchecked")
-      Map<String, Object> m = (Map<String, Object>) raw;
-      TitleStyle ts = new TitleStyle();
-      Object c = m.get("color");
-      Object s = m.get("sizeSp");
-      Object b = m.get("bold");
-      Object i = m.get("italic");
-      if (c instanceof Number)
-        ts.color = ((Number) c).intValue(); // ARGB int (signed is fine)
-      if (s instanceof Number)
-        ts.sizeSp = ((Number) s).doubleValue();
-      if (b instanceof Boolean)
-        ts.bold = (Boolean) b;
-      if (i instanceof Boolean)
-        ts.italic = (Boolean) i;
-      notificationDetails.titleStyle = ts;
-    }
-    Log.d("FLN-TitleStyle", "ANDROID RECEIVED: "
-        + (notificationDetails.titleStyle == null
-            ? "<null>"
-            : ("color=" + notificationDetails.titleStyle.color
-                + " sizeSp=" + notificationDetails.titleStyle.sizeSp
-                + " bold=" + notificationDetails.titleStyle.bold
-                + " italic=" + notificationDetails.titleStyle.italic)));
     notificationDetails.scheduledDateTime = (String) arguments.get(SCHEDULED_DATE_TIME);
     notificationDetails.timeZoneName = (String) arguments.get(TIME_ZONE_NAME);
     if (arguments.containsKey(SCHEDULED_NOTIFICATION_REPEAT_FREQUENCY)) {
@@ -279,6 +253,31 @@ public class NotificationDetails implements Serializable {
     @SuppressWarnings("unchecked")
     Map<String, Object> platformChannelSpecifics = (Map<String, Object>) arguments.get(PLATFORM_SPECIFICS);
     if (platformChannelSpecifics != null) {
+      Object rawTitle = platformChannelSpecifics.get(TITLE_STYLE);
+      if (rawTitle instanceof Map) {
+        @SuppressWarnings("unchecked")
+        Map<String, Object> m = (Map<String, Object>) rawTitle;
+        TitleStyle ts = new TitleStyle();
+        Object c = m.get("color");
+        Object s = m.get("sizeSp");
+        Object b = m.get("bold");
+        Object i = m.get("italic");
+        if (c instanceof Number)
+          ts.color = ((Number) c).intValue();
+        if (s instanceof Number)
+          ts.sizeSp = ((Number) s).doubleValue();
+        if (b instanceof Boolean)
+          ts.bold = (Boolean) b;
+        if (i instanceof Boolean)
+          ts.italic = (Boolean) i;
+        notificationDetails.titleStyle = ts;
+        android.util.Log.d(
+            "FLN-TitleStyle",
+            "READ titleStyle -> color=" + ts.color
+                + " sizeSp=" + ts.sizeSp
+                + " bold=" + ts.bold
+                + " italic=" + ts.italic);
+      }
       notificationDetails.autoCancel = (Boolean) platformChannelSpecifics.get(AUTO_CANCEL);
       notificationDetails.ongoing = (Boolean) platformChannelSpecifics.get(ONGOING);
       notificationDetails.silent = (Boolean) platformChannelSpecifics.get(SILENT);

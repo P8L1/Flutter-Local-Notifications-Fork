@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:ui';
+import 'dart:convert';
 
 import 'package:clock/clock.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications_platform_interface/flutter_local_notifications_platform_interface.dart';
+import 'package:flutter/foundation.dart';
 import 'package:timezone/timezone.dart';
 
 import 'callback_dispatcher.dart';
@@ -963,18 +965,21 @@ class MacOSFlutterLocalNotificationsPlugin
     String? body, {
     DarwinNotificationDetails? notificationDetails,
     String? payload,
-  }) {
+  }) async {
     validateId(id);
-    return _channel.invokeMethod(
-      'show',
-      <String, Object?>{
-        'id': id,
-        'title': title,
-        'body': body,
-        'payload': payload ?? '',
-        'platformSpecifics': notificationDetails?.toMap(),
-      },
-    );
+    final Map<String, Object?> args = <String, Object?>{
+      'id': id,
+      'title': title,
+      'body': body,
+      'payload': payload ?? '',
+    };
+    final Map<String, Object?>? android = notificationDetails?.toMap();
+    if (android != null) {
+      args.addAll(android);
+      args['platformSpecifics'] = android;
+    }
+    debugPrint('TitleStyle DART->ANDROID args: ${jsonEncode(args)}');
+    await _channel.invokeMethod('show', args);
   }
 
   @override

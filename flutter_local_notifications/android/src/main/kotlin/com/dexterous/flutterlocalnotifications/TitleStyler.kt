@@ -8,6 +8,7 @@ import android.text.Spanned
 import android.text.style.StyleSpan
 import android.util.Log
 import android.util.TypedValue
+import android.view.View
 import android.widget.RemoteViews
 import com.dexterous.flutterlocalnotifications.models.TitleStyle
 
@@ -17,21 +18,24 @@ internal object TitleStyler {
   private const val MIN_SIZE_SP = 8f
 
   /**
-   * Builds a RemoteViews that renders a styled title using the given TitleStyle.
+   * Builds a RemoteViews that renders a styled title (and optional body).
    * API 24+ only. Returns null if title is empty or style is null.
    */
   fun build(
     context: Context,
     title: CharSequence?,
+    // NEW: body text to render below the title (default styling)
+    body: CharSequence?,
     style: TitleStyle?
   ): RemoteViews? {
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return null
     if (title.isNullOrEmpty() || style == null) return null
 
     val rv = RemoteViews(context.packageName, R.layout.fln_notif_title_only)
-    val id = R.id.fln_title
+    val titleId = R.id.fln_title
+    val bodyId = R.id.fln_body
 
-    // 1) Build styled text (bold/italic via spans)
+    // 1) Build styled title (bold/italic via spans)
     val styled: CharSequence = if ((style.bold == true) || (style.italic == true)) {
       val s = SpannableString(title)
       when {
@@ -46,24 +50,31 @@ internal object TitleStyler {
     } else {
       title
     }
- style.color?.let { rv.setTextColor(id, it) }
-    // 2) Apply color and size deterministically (if provided)
+
+    // Apply title color/size
+    style.color?.let { rv.setTextColor(titleId, it) }
     style.sizeSp?.let {
       if (it > 0.0) {
         val sp = it.toFloat().coerceIn(MIN_SIZE_SP, MAX_SIZE_SP)
-        rv.setTextViewTextSize(id, TypedValue.COMPLEX_UNIT_SP, sp)
+        rv.setTextViewTextSize(titleId, TypedValue.COMPLEX_UNIT_SP, sp)
       } else {
         Log.d(TAG, "Ignoring non-positive sizeSp: $it")
       }
     }
 
-    // 3) Set the final text last (ensures spans + color/size stick)
-    rv.setTextViewText(id, styled)
+    // Set title last (ensures spans + color/size stick)
+    rv.setTextViewText(titleId, styled)
 
-    Log.d(
-      TAG,
-      "APPLY rv; color=${style.color?.toString(16)} size=${style.sizeSp} bold=${style.bold} italic=${style.italic}"
-    )
+    // 2) Body/description (default appearance), only if provided
+    if (!body.isNullOrEmpty()) {
+      rv.setViewVisibility(bodyId, View.VISIBLE)
+      rv.setTextViewText(bodyId, body)
+      // We intentionally don't override color/size: let system theme handle it
+    } else {
+      rv.setViewVisibility(bodyId, View.GONE)
+    }
+
+    Log.d(TAG, "APPLY rv; color=${style.color?.toString(16)} size=${style.sizeSp} bold=${style.bold} italic=${style.italic}; bodyEmpty=${body.isNullOrEmpty()}")
     return rv
   }
 }

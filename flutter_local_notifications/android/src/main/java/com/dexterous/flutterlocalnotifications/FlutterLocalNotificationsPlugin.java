@@ -287,7 +287,8 @@ public class FlutterLocalNotificationsPlugin
         ? debugFallbackStyle()
         : received;
 
-    final RemoteViews customView = TitleStyler.INSTANCE.build(context, notificationDetails.title, effective);
+    final RemoteViews customView = TitleStyler.INSTANCE.build(context, notificationDetails.title,
+        notificationDetails.body, effective);
 
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationDetails.channelId)
         .setTicker(notificationDetails.ticker)
@@ -1236,56 +1237,106 @@ public class FlutterLocalNotificationsPlugin
   }
 
   private static void setupNotificationChannel(
-      Context context, NotificationChannelDetails notificationChannelDetails) {
-    if (VERSION.SDK_INT >= VERSION_CODES.O) {
-      NotificationManager notificationManager = (NotificationManager) context
-          .getSystemService(Context.NOTIFICATION_SERVICE);
-      NotificationChannel notificationChannel = new NotificationChannel(
-          notificationChannelDetails.id,
-          notificationChannelDetails.name,
-          notificationChannelDetails.importance);
-      notificationChannel.setDescription(notificationChannelDetails.description);
-      notificationChannel.setGroup(notificationChannelDetails.groupId);
-      if (notificationChannelDetails.playSound) {
-        Integer audioAttributesUsage = notificationChannelDetails.audioAttributesUsage != null
-            ? notificationChannelDetails.audioAttributesUsage
-            : AudioAttributes.USAGE_NOTIFICATION;
-        AudioAttributes audioAttributes = new AudioAttributes.Builder().setUsage(audioAttributesUsage).build();
-        Uri uri = retrieveSoundResourceUri(
-            context, notificationChannelDetails.sound, notificationChannelDetails.soundSource);
-        notificationChannel.setSound(uri, audioAttributes);
-      } else {
-        notificationChannel.setSound(null, null);
-      }
+      Context context, NotificationChannelDetails d) {
+    if (VERSION.SDK_INT < VERSION_CODES.O)
+      return;
 
-      if (BooleanUtils.getValue(notificationChannelDetails.bypassDnd)) {
-        boolean isAccessGranted = notificationManager.isNotificationPolicyAccessGranted();
+    final NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        if (isAccessGranted) {
-          notificationChannel.setBypassDnd(true);
-        } else {
-          Log.w(
-              TAG,
-              "Channel '"
-                  + notificationChannelDetails.name
-                  + "' was set to bypass Do Not Disturb but the OS prevents it.");
+    // -------- Sanitize & defaults --------
+    // Channel ID must be non-empty
+    final String channelId = (d.id != null && !d.id.trim().isEmpty()) ? d.id.trim() : "default";
+
+    // Channel name must be non-empty (system enforces)
+    final String channelName = (d.name != null && !d.name.trim().isEmpty()) ? d.name.trim() : "General";
+
+    // Importance must be in allowed range; default if null/out-of-range
+    int imp = (d.importance != null) ? d.importance : NotificationManager.IMPORTANCE_DEFAULT;
+    // clamp to [NONE..HIGH] (O+)
+    if (imp < NotificationManager.IMPORTANCE_NONE)
+      imp = NotificationManager.IMPORTANCE_NONE;
+    if (imp > NotificationManager.IMPORTANCE_HIGH)
+      imp = NotificationManager.IMPORTANCE_HIGH;
+
+    final boolean playSound = BooleanUtils.getValue(d.playSound);
+    final int usage = (d.audioAttributesUsage != null)
+        ? d.audioAttributesUsage
+        : AudioAttributes.USAGE_NOTIFICATION;
+
+    final boolean enableVibration = BooleanUtils.getValue(d.enableVibration);
+    final boolean enableLights = BooleanUtils.getValue(d.enableLights);
+    final boolean showBadge = BooleanUtils.getValue(d.showBadge);
+
+    // Vibration pattern: filter invalid/negative values
+    long[] vib = d.vibrationPattern;
+    if (vib != null && vib.length > 0) {
+      boolean bad = false;
+      for (int i = 0; i < vib.length; i++) {
+        if (vib[i] < 0) {
+          bad = true;
+          break;
         }
       }
-
-      notificationChannel.enableVibration(
-          BooleanUtils.getValue(notificationChannelDetails.enableVibration));
-      if (notificationChannelDetails.vibrationPattern != null
-          && notificationChannelDetails.vibrationPattern.length > 0) {
-        notificationChannel.setVibrationPattern(notificationChannelDetails.vibrationPattern);
-      }
-      boolean enableLights = BooleanUtils.getValue(notificationChannelDetails.enableLights);
-      notificationChannel.enableLights(enableLights);
-      if (enableLights && notificationChannelDetails.ledColor != null) {
-        notificationChannel.setLightColor(notificationChannelDetails.ledColor);
-      }
-      notificationChannel.setShowBadge(BooleanUtils.getValue(notificationChannelDetails.showBadge));
-      notificationManager.createNotificationChannel(notificationChannel);
+      if (bad)
+        vib = null;
     }
+
+    // -------- DIAGNOSTIC LOGS --------
+    Log.d("FLN-Channel",
+        "creating channel id=" + channelId
+            + " name=" + channelName
+            + " importance=" + imp
+            + " playSound=" + playSound
+            + " enableVibration=" + enableVibration
+            + " enableLights=" + enableLights
+            + " showBadge=" + showBadge);
+
+    // -------- Create channel --------
+    final NotificationChannel ch = new NotificationChannel(channelId, channelName, imp);
+
+    // Description (nullable OK)
+    ch.setDescription(d.description);
+
+    // Group (guard null/empty)
+    if (d.groupId != null && !d.groupId.trim().isEmpty()) {
+      ch.setGroup(d.groupId.trim());
+    }
+
+    // Sound
+    if (playSound) {
+      final AudioAttributes aa = new AudioAttributes.Builder().setUsage(usage).build();
+      final Uri soundUri = retrieveSoundResourceUri(context, d.sound, d.soundSource);
+      ch.setSound(soundUri, aa);
+    } else {
+      ch.setSound(null, null);
+    }
+
+    // Bypass DND (only if policy granted)
+    if (BooleanUtils.getValue(d.bypassDnd)) {
+      if (nm.isNotificationPolicyAccessGranted()) {
+        ch.setBypassDnd(true);
+      } else {
+        Log.w("FLN-Channel", "bypassDnd requested but policy access not granted");
+      }
+    }
+
+    // Vibration
+    ch.enableVibration(enableVibration);
+    if (enableVibration && vib != null && vib.length > 0) {
+      ch.setVibrationPattern(vib);
+    }
+
+    // Lights
+    ch.enableLights(enableLights);
+    if (enableLights && d.ledColor != null) {
+      ch.setLightColor(d.ledColor);
+    }
+
+    ch.setShowBadge(showBadge);
+
+    // Final diagnostic before creating
+    Log.d("FLN-Channel", "createNotificationChannel() now...");
+    nm.createNotificationChannel(ch);
   }
 
   private static Uri retrieveSoundResourceUri(
