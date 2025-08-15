@@ -207,6 +207,21 @@ public class FlutterLocalNotificationsPlugin
 
   private PermissionRequestProgress permissionRequestProgress = PermissionRequestProgress.None;
 
+  private static String fmtTitleStyle(com.dexterous.flutterlocalnotifications.models.TitleStyle ts) {
+    if (ts == null)
+      return "<null>";
+    return "color=" + ts.color + " sizeSp=" + ts.sizeSp + " bold=" + ts.bold + " italic=" + ts.italic;
+  }
+
+  private static com.dexterous.flutterlocalnotifications.models.TitleStyle debugFallbackStyle() {
+    com.dexterous.flutterlocalnotifications.models.TitleStyle ts = new com.dexterous.flutterlocalnotifications.models.TitleStyle();
+    ts.color = 0xFF0000FF; // BLUE (ARGB) – TEMPORARY
+    ts.sizeSp = 18.0;
+    ts.bold = Boolean.TRUE;
+    ts.italic = Boolean.FALSE;
+    return ts;
+  }
+
   static void rescheduleNotifications(Context context) {
     ArrayList<NotificationDetails> scheduledNotifications = loadScheduledNotifications(context);
     for (NotificationDetails notificationDetails : scheduledNotifications) {
@@ -261,15 +276,20 @@ public class FlutterLocalNotificationsPlugin
     }
     PendingIntent pendingIntent = PendingIntent.getActivity(context, notificationDetails.id, intent, flags);
     DefaultStyleInformation defaultStyleInformation = (DefaultStyleInformation) notificationDetails.styleInformation;
+    final boolean canCustom = android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N;
+    final com.dexterous.flutterlocalnotifications.models.TitleStyle received = notificationDetails.titleStyle;
+    android.util.Log.d("FLN-TitleStyle", "ANDROID RECEIVED " + fmtTitleStyle(received)
+        + " sdk=" + android.os.Build.VERSION.SDK_INT + " title=" + notificationDetails.title);
+
+    // TEMP: keep custom path alive even if titleStyle is null, so we can see
+    // something
+    final com.dexterous.flutterlocalnotifications.models.TitleStyle effective = (canCustom && received == null)
+        ? debugFallbackStyle()
+        : received;
+
+    final RemoteViews customView = TitleStyler.INSTANCE.build(context, notificationDetails.title, effective);
+
     NotificationCompat.Builder builder = new NotificationCompat.Builder(context, notificationDetails.channelId)
-        .setContentTitle(
-            defaultStyleInformation.htmlFormatTitle
-                ? fromHtml(notificationDetails.title)
-                : notificationDetails.title)
-        .setContentText(
-            defaultStyleInformation.htmlFormatBody
-                ? fromHtml(notificationDetails.body)
-                : notificationDetails.body)
         .setTicker(notificationDetails.ticker)
         .setAutoCancel(BooleanUtils.getValue(notificationDetails.autoCancel))
         .setContentIntent(pendingIntent)
@@ -404,7 +424,12 @@ public class FlutterLocalNotificationsPlugin
       builder.setShortcutId(notificationDetails.shortcutId);
     }
 
-    if (!StringUtils.isNullOrEmpty(notificationDetails.subText)) {
+    // if (!StringUtils.isNullOrEmpty(notificationDetails.subText)) {
+    // builder.setSubText(notificationDetails.subText);
+    // }
+    // In debug mode, NEVER set subText when using custom (prevents extra white
+    // line)
+    if (customView == null && !StringUtils.isNullOrEmpty(notificationDetails.subText)) {
       builder.setSubText(notificationDetails.subText);
     }
 
@@ -417,20 +442,59 @@ public class FlutterLocalNotificationsPlugin
     setSound(context, notificationDetails, builder);
     setVibrationPattern(notificationDetails, builder);
     setLights(notificationDetails, builder);
-    setStyle(context, notificationDetails, builder);
     setProgress(notificationDetails, builder);
     setCategory(notificationDetails, builder);
     setTimeoutAfter(notificationDetails, builder);
-    RemoteViews customView = TitleStyler.INSTANCE.build(
-        context, notificationDetails.title, notificationDetails.titleStyle);
+    if (customView == null) {
+      setStyle(context, notificationDetails, builder);
+    }
+    // if (customView != null) {
+    // builder.setCustomContentView(customView); // collapsed
+    // builder.setCustomBigContentView(customView); // expanded
+    // builder.setCustomHeadsUpContentView(customView);
+    // builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+    // builder.setContentTitle((CharSequence) null); // explicitly clear
+    // builder.setContentText((CharSequence) null);
+
+    // } else {
+    // // Fallback to normal template
+    // builder.setContentTitle(
+    // defaultStyleInformation.htmlFormatTitle
+    // ? fromHtml(notificationDetails.title)
+    // : notificationDetails.title);
+    // builder.setContentText(
+    // defaultStyleInformation.htmlFormatBody
+    // ? fromHtml(notificationDetails.body)
+    // : notificationDetails.body);
+    // }
     if (customView != null) {
+      // Attach our custom layout in ALL paths and suppress any system text
       builder.setCustomContentView(customView);
       builder.setCustomBigContentView(customView);
+      builder.setCustomHeadsUpContentView(customView);
       builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+      builder.setContentTitle((CharSequence) null);
+      builder.setContentText((CharSequence) null);
+      builder.setSubText((CharSequence) null);
+    } else {
+      // Fallback to system template
+      builder.setContentTitle(
+          defaultStyleInformation.htmlFormatTitle
+              ? fromHtml(notificationDetails.title)
+              : notificationDetails.title);
+      builder.setContentText(
+          defaultStyleInformation.htmlFormatBody
+              ? fromHtml(notificationDetails.body)
+              : notificationDetails.body);
     }
     Notification notification = builder.build();
-    if (notificationDetails.additionalFlags != null
-        && notificationDetails.additionalFlags.length > 0) {
+    // LOG which layouts Android actually attached
+    int cv = (notification.contentView != null) ? notification.contentView.getLayoutId() : -1;
+    int bcv = (notification.bigContentView != null) ? notification.bigContentView.getLayoutId() : -1;
+    int huv = (notification.headsUpContentView != null) ? notification.headsUpContentView.getLayoutId() : -1;
+    Log.d("FLN-TitleStyle", "LAYOUTS -> contentView=" + cv + " big=" + bcv + " headsUp=" + huv +
+        " (expect all == R.layout.fln_notif_title_only, i.e., " + R.layout.fln_notif_title_only + ")");
+    if (notificationDetails.additionalFlags != null && notificationDetails.additionalFlags.length > 0) {
       for (int additionalFlag : notificationDetails.additionalFlags) {
         notification.flags |= additionalFlag;
       }

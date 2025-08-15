@@ -14,42 +14,56 @@ import com.dexterous.flutterlocalnotifications.models.TitleStyle
 internal object TitleStyler {
   private const val TAG = "TitleStyler"
   private const val MAX_SIZE_SP = 26f
+  private const val MIN_SIZE_SP = 8f
 
+  /**
+   * Builds a RemoteViews that renders a styled title using the given TitleStyle.
+   * API 24+ only. Returns null if title is empty or style is null.
+   */
   fun build(
     context: Context,
     title: CharSequence?,
     style: TitleStyle?
   ): RemoteViews? {
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
-      return null
-    }
-    if (title.isNullOrEmpty() || style == null) {
-      return null
-    }
-    val remoteViews = RemoteViews(context.packageName, R.layout.fln_notif_title_only)
-    val viewId = R.id.fln_title
-    remoteViews.setTextViewText(viewId, title)
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N) return null
+    if (title.isNullOrEmpty() || style == null) return null
 
-    style.color?.let { remoteViews.setTextColor(viewId, it) }
+    val rv = RemoteViews(context.packageName, R.layout.fln_notif_title_only)
+    val id = R.id.fln_title
 
+    // 1) Build styled text (bold/italic via spans)
+    val styled: CharSequence = if ((style.bold == true) || (style.italic == true)) {
+      val s = SpannableString(title)
+      when {
+        style.bold == true && style.italic == true ->
+          s.setSpan(StyleSpan(Typeface.BOLD_ITALIC), 0, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        style.bold == true ->
+          s.setSpan(StyleSpan(Typeface.BOLD), 0, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        style.italic == true ->
+          s.setSpan(StyleSpan(Typeface.ITALIC), 0, s.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+      }
+      s
+    } else {
+      title
+    }
+ style.color?.let { rv.setTextColor(id, it) }
+    // 2) Apply color and size deterministically (if provided)
     style.sizeSp?.let {
-      if (it > 0) {
-        val size = it.toFloat().coerceAtMost(MAX_SIZE_SP)
-        remoteViews.setTextViewTextSize(viewId, TypedValue.COMPLEX_UNIT_SP, size)
+      if (it > 0.0) {
+        val sp = it.toFloat().coerceIn(MIN_SIZE_SP, MAX_SIZE_SP)
+        rv.setTextViewTextSize(id, TypedValue.COMPLEX_UNIT_SP, sp)
       } else {
         Log.d(TAG, "Ignoring non-positive sizeSp: $it")
       }
     }
 
-    val bold = style.bold == true
-    val italic = style.italic == true
-    if (bold || italic) {
-      val flags = (if (bold) Typeface.BOLD else 0) or (if (italic) Typeface.ITALIC else 0)
-      val spannable = SpannableString(title)
-      spannable.setSpan(StyleSpan(flags), 0, spannable.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-      remoteViews.setTextViewText(viewId, spannable)
-    }
+    // 3) Set the final text last (ensures spans + color/size stick)
+    rv.setTextViewText(id, styled)
 
-    return remoteViews
+    Log.d(
+      TAG,
+      "APPLY rv; color=${style.color?.toString(16)} size=${style.sizeSp} bold=${style.bold} italic=${style.italic}"
+    )
+    return rv
   }
 }

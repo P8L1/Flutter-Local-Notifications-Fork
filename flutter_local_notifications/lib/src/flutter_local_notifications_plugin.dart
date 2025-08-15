@@ -240,6 +240,15 @@ class FlutterLocalNotificationsPlugin {
     if (kIsWeb) {
       return;
     }
+
+    debugPrint(' TitleStyle [show()] called');
+    debugPrint(' TitleStyle  Platform: $defaultTargetPlatform');
+    debugPrint(' TitleStyle  id: $id');
+    debugPrint(' TitleStyle  title: $title');
+    debugPrint(' TitleStyle  body: $body');
+    debugPrint(' TitleStyle  payload: $payload');
+    debugPrint(
+        ' TitleStyle  NotificationDetails: ${notificationDetails?.android}');
     if (defaultTargetPlatform == TargetPlatform.android) {
       await resolvePlatformSpecificImplementation<
               AndroidFlutterLocalNotificationsPlugin>()

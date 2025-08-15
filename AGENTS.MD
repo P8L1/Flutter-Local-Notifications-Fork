@@ -258,3 +258,9 @@ At the root of your locally cloned repository bootstrap the all dependencies and
 
 melos bootstrap
 This removes the need for providing manual dependency_overrides. There's no need to run flutter pub get either. All the packages, example app and tests will run for the locally cloned repository. The workflows setup on GitHub are also configured use Melos to validate changes. For more information on Melos, refer to its website
+
+Some files to check are
+flutter_local_notifications/android/src/main/java/com/dexterous/flutterlocalnotifications/FlutterLocalNotificationsPlugin.java flutter_local_notifications/android/src/main/java/com/dexterous/flutterlocalnotifications/models/NotificationDetails.java flutter_local_notifications/android/src/main/java/com/dexterous/flutterlocalnotifications/models/TitleStyle.java flutter_local_notifications/android/src/main/kotlin/com/dexterous/flutterlocalnotifications/TitleStyler.kt  
+flutter_local_notifications/android/src/main/res/layout/fln_notif_title_only.xml
+flutter_local_notifications/android/src/test/java/com/dexterous/flutterlocalnotifications/TitleStylerTest.kt  
+flutter_local_notifications/lib/src/platform_specifics/android/notification_details.dart

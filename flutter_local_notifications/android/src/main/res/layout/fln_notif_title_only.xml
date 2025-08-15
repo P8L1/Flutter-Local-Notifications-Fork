@@ -14,5 +14,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:maxLines="2"
-        android:ellipsize="end" />
+        android:ellipsize="end"
+        android:text="(debug: custom title here)"
+    />
 </LinearLayout>
