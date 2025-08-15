@@ -15,6 +15,7 @@ import com.dexterous.flutterlocalnotifications.models.styles.MessagingStyleInfor
 import com.dexterous.flutterlocalnotifications.models.styles.StyleInformation;
 import com.dexterous.flutterlocalnotifications.utils.LongUtils;
 import com.google.gson.annotations.SerializedName;
+import com.dexterous.flutterlocalnotifications.models.TitleStyle;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -128,6 +129,7 @@ public class NotificationDetails implements Serializable {
   private static final String COLORIZED = "colorized";
   private static final String NUMBER = "number";
   private static final String AUDIO_ATTRIBUTES_USAGE = "audioAttributesUsage";
+  private static final String TITLE_STYLE = "titleStyle";
 
   public Integer id;
   public String title;
@@ -198,6 +200,7 @@ public class NotificationDetails implements Serializable {
   public Boolean colorized;
   public Integer number;
   public Integer audioAttributesUsage;
+  public TitleStyle titleStyle;
 
   // Note: this is set on the Android to save details about the icon that should be used when
   // re-hydrating scheduled notifications when a device has been restarted.

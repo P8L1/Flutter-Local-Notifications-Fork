@@ -42,6 +42,37 @@ void main() {
       });
     });
 
+    test('show with Android title style', () async {
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        titleStyle: AndroidNotificationTitleStyle(
+          color: 0xFF58CC02,
+          sizeSp: 16,
+          bold: true,
+          italic: true,
+        ),
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        1,
+        'notification title',
+        'notification body',
+        const NotificationDetails(android: androidNotificationDetails),
+      );
+
+      final Map<String, Object?> platformSpecifics =
+          (log.last.arguments as Map<String, Object?>)['platformSpecifics']
+              as Map<String, Object?>;
+      expect(platformSpecifics['titleStyle'], <String, Object?>{
+        'color': 0xFF58CC02,
+        'sizeSp': 16,
+        'bold': true,
+        'italic': true,
+      });
+    });
+
     tearDown(() {
       log.clear();
     });

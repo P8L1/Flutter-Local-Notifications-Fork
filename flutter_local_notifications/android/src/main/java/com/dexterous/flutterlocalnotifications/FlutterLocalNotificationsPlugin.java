@@ -35,6 +35,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.annotation.Keep;
 import androidx.annotation.NonNull;
@@ -74,6 +75,7 @@ import com.dexterous.flutterlocalnotifications.models.styles.StyleInformation;
 import com.dexterous.flutterlocalnotifications.utils.BooleanUtils;
 import com.dexterous.flutterlocalnotifications.utils.LongUtils;
 import com.dexterous.flutterlocalnotifications.utils.StringUtils;
+import com.dexterous.flutterlocalnotifications.TitleStyler;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -443,6 +445,13 @@ public class FlutterLocalNotificationsPlugin
     setProgress(notificationDetails, builder);
     setCategory(notificationDetails, builder);
     setTimeoutAfter(notificationDetails, builder);
+    RemoteViews customView =
+        TitleStyler.build(context, notificationDetails.title, notificationDetails.titleStyle);
+    if (customView != null) {
+      builder.setCustomContentView(customView);
+      builder.setCustomBigContentView(customView);
+      builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+    }
     Notification notification = builder.build();
     if (notificationDetails.additionalFlags != null
         && notificationDetails.additionalFlags.length > 0) {
