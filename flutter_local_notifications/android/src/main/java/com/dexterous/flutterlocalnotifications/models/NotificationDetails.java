@@ -274,8 +274,11 @@ public class NotificationDetails implements Serializable {
           ts.bold = (Boolean) b;
         if (i instanceof Boolean)
           ts.italic = (Boolean) i;
-        if (p instanceof Number)
+        if (p instanceof Number){
           ts.iconSpacingDp = ((Number) p).doubleValue();
+        } else {
+          ts.iconSpacingDp = 0;
+        }
         notificationDetails.titleStyle = ts;
       }
       Object rawDesc = platformChannelSpecifics.get(DESCRIPTION_STYLE);

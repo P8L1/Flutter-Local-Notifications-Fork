@@ -646,7 +646,7 @@ final androidDetails = AndroidNotificationDetails(
         sizeSp: 16,
         bold: true,
         italic: false,
-        iconSpacing: 12,
+        iconSpacing: 2,
     ),
     descriptionStyle: const AndroidNotificationDescriptionStyle(
         color: 0xFFFF0000,
