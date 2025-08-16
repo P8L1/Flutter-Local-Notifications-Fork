@@ -109,32 +109,24 @@ void main() {
       expect(platformSpecifics['channelId'], 'channelId');
     });
 
-    test('show with Android title style negative size', () async {
-      final AndroidNotificationDetails androidNotificationDetails =
-          AndroidNotificationDetails(
-        'channelId',
-        'channelName',
-        titleStyle: AndroidNotificationTitleStyle(
-          sizeSp: -10,
+    test('show with Android title style negative size', () {
+      expect(
+        () => flutterLocalNotificationsPlugin.show(
+          3,
+          'notification title',
+          'notification body',
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              'channelId',
+              'channelName',
+              titleStyle: AndroidNotificationTitleStyle(
+                sizeSp: -10,
+              ),
+            ),
+          ),
         ),
+        throwsAssertionError,
       );
-
-      await flutterLocalNotificationsPlugin.show(
-        3,
-        'notification title',
-        'notification body',
-        NotificationDetails(android: androidNotificationDetails),
-      );
-
-      final Map<Object?, Object?> arguments =
-          log.last.arguments as Map<Object?, Object?>;
-      final Map<String, Object?> platformSpecifics = Map<String, Object?>.from(
-        arguments['platformSpecifics'] as Map<Object?, Object?>,
-      );
-      expect(platformSpecifics['titleStyle'], <String, Object?>{
-        'sizeSp': -10,
-      });
-      expect(platformSpecifics['channelId'], 'channelId');
     });
 
     test('show with Android title style bold and italic separately', () async {
