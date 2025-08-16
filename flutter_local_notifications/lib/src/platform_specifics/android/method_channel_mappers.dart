@@ -101,6 +101,29 @@ extension AndroidNotificationTitleStyleMapper on AndroidNotificationTitleStyle {
   }
 }
 
+extension AndroidNotificationDescriptionStyleMapper
+    on AndroidNotificationDescriptionStyle {
+  Map<String, Object?> toMap() {
+    final Map<String, Object?> map = <String, Object?>{};
+    if (color != null) {
+      assert(color! >= 0 && color! <= 0xFFFFFFFF);
+      map['color'] = color;
+    }
+    if (sizeSp != null) {
+      map['sizeSp'] = sizeSp;
+    }
+    if (bold != null) {
+      map['bold'] = bold;
+    }
+    if (italic != null) {
+      map['italic'] = italic;
+    }
+    assert(map.keys.toSet().length == map.length);
+    assert(map.values.every((Object? v) => v != null));
+    return map;
+  }
+}
+
 Map<String, Object> _convertNotificationSoundToMap(
     AndroidNotificationSound? sound) {
   if (sound is RawResourceAndroidNotificationSound) {
@@ -274,6 +297,7 @@ extension AndroidNotificationDetailsMapper on AndroidNotificationDetails {
       'number': number,
       'audioAttributesUsage': audioAttributesUsage.value,
       'titleStyle': titleStyle?.toMap(),
+      'descriptionStyle': descriptionStyle?.toMap(),
     }
       ..addAll(_convertActionsToMap(actions))
       ..addAll(_convertStyleInformationToMap())

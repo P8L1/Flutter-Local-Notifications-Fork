@@ -110,6 +110,134 @@ void main() {
       expect(platformSpecifics['channelId'], 'channelId');
     });
 
+    test('show with Android description style', () async {
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        descriptionStyle: AndroidNotificationDescriptionStyle(
+          color: 0xFF58CC02,
+          sizeSp: 16,
+          bold: true,
+          italic: true,
+        ),
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        6,
+        'notification title',
+        'notification body',
+        const NotificationDetails(android: androidNotificationDetails),
+      );
+
+      final Map<Object?, Object?> arguments =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> platformSpecifics = Map<String, Object?>.from(
+        arguments['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(platformSpecifics['descriptionStyle'], <String, Object?>{
+        'color': 0xFF58CC02,
+        'sizeSp': 16,
+        'bold': true,
+        'italic': true,
+      });
+    });
+
+    test('show with Android description style color only', () async {
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        descriptionStyle: AndroidNotificationDescriptionStyle(
+          color: 0xFF0000FF,
+        ),
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        7,
+        'notification title',
+        'notification body',
+        const NotificationDetails(android: androidNotificationDetails),
+      );
+
+      final Map<Object?, Object?> arguments =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> platformSpecifics = Map<String, Object?>.from(
+        arguments['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(platformSpecifics['descriptionStyle'], <String, Object?>{
+        'color': 0xFF0000FF,
+      });
+      expect(platformSpecifics['channelId'], 'channelId');
+    });
+
+    test('show with Android description style negative size', () {
+      expect(
+        () => flutterLocalNotificationsPlugin.show(
+          8,
+          'notification title',
+          'notification body',
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              'channelId',
+              'channelName',
+              descriptionStyle: AndroidNotificationDescriptionStyle(
+                sizeSp: -10,
+              ),
+            ),
+          ),
+        ),
+        throwsAssertionError,
+      );
+    });
+
+    test('show with Android description style bold and italic separately',
+        () async {
+      const AndroidNotificationDetails boldDetails = AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        descriptionStyle: AndroidNotificationDescriptionStyle(bold: true),
+      );
+      const AndroidNotificationDetails italicDetails =
+          AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        descriptionStyle: AndroidNotificationDescriptionStyle(italic: true),
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        9,
+        'title',
+        'body',
+        const NotificationDetails(android: boldDetails),
+      );
+      final Map<Object?, Object?> boldArgs =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> boldSpecifics = Map<String, Object?>.from(
+        boldArgs['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(boldSpecifics['descriptionStyle'], <String, Object?>{
+        'bold': true,
+      });
+      expect(boldSpecifics['channelId'], 'channelId');
+
+      await flutterLocalNotificationsPlugin.show(
+        10,
+        'title',
+        'body',
+        const NotificationDetails(android: italicDetails),
+      );
+      final Map<Object?, Object?> italicArgs =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> italicSpecifics = Map<String, Object?>.from(
+        italicArgs['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(italicSpecifics['descriptionStyle'], <String, Object?>{
+        'italic': true,
+      });
+      expect(italicSpecifics['channelId'], 'channelId');
+    });
+
     test('show with Android title style negative size', () {
       expect(
         () => flutterLocalNotificationsPlugin.show(
