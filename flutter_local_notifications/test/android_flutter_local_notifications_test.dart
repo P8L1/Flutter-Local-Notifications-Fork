@@ -105,6 +105,7 @@ void main() {
       );
       expect(platformSpecifics['titleStyle'], <String, Object?>{
         'color': 0xFF0000FF,
+        'iconSpacingDp': 1,
       });
       expect(platformSpecifics['channelId'], 'channelId');
     });
@@ -153,9 +154,8 @@ void main() {
       final Map<String, Object?> boldSpecifics = Map<String, Object?>.from(
         boldArgs['platformSpecifics'] as Map<Object?, Object?>,
       );
-      expect(boldSpecifics['titleStyle'], <String, Object?>{
-        'bold': true,
-      });
+      expect(boldSpecifics['titleStyle'],
+          <String, Object?>{'bold': true, 'iconSpacingDp': 1.0});
       expect(boldSpecifics['channelId'], 'channelId');
 
       await flutterLocalNotificationsPlugin.show(
@@ -169,9 +169,8 @@ void main() {
       final Map<String, Object?> italicSpecifics = Map<String, Object?>.from(
         italicArgs['platformSpecifics'] as Map<Object?, Object?>,
       );
-      expect(italicSpecifics['titleStyle'], <String, Object?>{
-        'italic': true,
-      });
+      expect(italicSpecifics['titleStyle'],
+          <String, Object?>{'italic': true, 'iconSpacingDp': 1.0});
       expect(italicSpecifics['channelId'], 'channelId');
     });
     test('initialize', () async {
