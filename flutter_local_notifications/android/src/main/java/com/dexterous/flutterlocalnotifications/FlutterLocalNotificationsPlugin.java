@@ -210,7 +210,8 @@ public class FlutterLocalNotificationsPlugin
   private static String fmtTitleStyle(com.dexterous.flutterlocalnotifications.models.TitleStyle ts) {
     if (ts == null)
       return "<null>";
-    return "color=" + ts.color + " sizeSp=" + ts.sizeSp + " bold=" + ts.bold + " italic=" + ts.italic;
+      return "color=" + ts.color + " sizeSp=" + ts.sizeSp + " bold=" + ts.bold + " italic=" + ts.italic
+        + " iconSpacingDp=" + ts.iconSpacingDp;
   }
 
   private static com.dexterous.flutterlocalnotifications.models.TitleStyle debugFallbackStyle() {
@@ -219,6 +220,7 @@ public class FlutterLocalNotificationsPlugin
     ts.sizeSp = 18.0;
     ts.bold = Boolean.TRUE;
     ts.italic = Boolean.FALSE;
+    ts.iconSpacingDp = 16.0;
     return ts;
   }
 

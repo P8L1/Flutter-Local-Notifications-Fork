@@ -646,6 +646,7 @@ final androidDetails = AndroidNotificationDetails(
     sizeSp: 16,
     bold: true,
     italic: false,
+    iconSpacing: 12,
   ),
 );
 ```

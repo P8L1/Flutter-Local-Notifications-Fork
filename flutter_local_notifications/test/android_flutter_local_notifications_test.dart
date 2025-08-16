@@ -52,6 +52,7 @@ void main() {
           sizeSp: 16,
           bold: true,
           italic: true,
+          iconSpacing: 10,
         ),
       );
 
@@ -72,6 +73,7 @@ void main() {
         'sizeSp': 16,
         'bold': true,
         'italic': true,
+        'iconSpacingDp': 10,
       });
     });
 
@@ -79,6 +81,107 @@ void main() {
       log.clear();
     });
 
+    test('show with Android title style color only', () async {
+      const AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        titleStyle: AndroidNotificationTitleStyle(
+          color: 0xFF0000FF,
+        ),
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        2,
+        'notification title',
+        'notification body',
+        const NotificationDetails(android: androidNotificationDetails),
+      );
+
+      final Map<Object?, Object?> arguments =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> platformSpecifics = Map<String, Object?>.from(
+        arguments['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(platformSpecifics['titleStyle'], <String, Object?>{
+        'color': 0xFF0000FF,
+      });
+      expect(platformSpecifics['channelId'], 'channelId');
+    });
+
+    test('show with Android title style negative size', () async {
+      final AndroidNotificationDetails androidNotificationDetails =
+          AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        titleStyle: AndroidNotificationTitleStyle(
+          sizeSp: -10,
+        ),
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        3,
+        'notification title',
+        'notification body',
+        NotificationDetails(android: androidNotificationDetails),
+      );
+
+      final Map<Object?, Object?> arguments =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> platformSpecifics = Map<String, Object?>.from(
+        arguments['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(platformSpecifics['titleStyle'], <String, Object?>{
+        'sizeSp': -10,
+      });
+      expect(platformSpecifics['channelId'], 'channelId');
+    });
+
+    test('show with Android title style bold and italic separately', () async {
+      const AndroidNotificationDetails boldDetails = AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        titleStyle: AndroidNotificationTitleStyle(bold: true),
+      );
+      const AndroidNotificationDetails italicDetails =
+          AndroidNotificationDetails(
+        'channelId',
+        'channelName',
+        titleStyle: AndroidNotificationTitleStyle(italic: true),
+      );
+
+      await flutterLocalNotificationsPlugin.show(
+        4,
+        'title',
+        'body',
+        const NotificationDetails(android: boldDetails),
+      );
+      final Map<Object?, Object?> boldArgs =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> boldSpecifics = Map<String, Object?>.from(
+        boldArgs['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(boldSpecifics['titleStyle'], <String, Object?>{
+        'bold': true,
+      });
+      expect(boldSpecifics['channelId'], 'channelId');
+
+      await flutterLocalNotificationsPlugin.show(
+        5,
+        'title',
+        'body',
+        const NotificationDetails(android: italicDetails),
+      );
+      final Map<Object?, Object?> italicArgs =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> italicSpecifics = Map<String, Object?>.from(
+        italicArgs['platformSpecifics'] as Map<Object?, Object?>,
+      );
+      expect(italicSpecifics['titleStyle'], <String, Object?>{
+        'italic': true,
+      });
+      expect(italicSpecifics['channelId'], 'channelId');
+    });
     test('initialize', () async {
       const AndroidInitializationSettings androidInitializationSettings =
           AndroidInitializationSettings('app_icon');

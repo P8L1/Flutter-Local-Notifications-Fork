@@ -20,11 +20,11 @@ internal object TitleStyler {
   
     // Builds a RemoteViews that renders a styled title (and optional body).
     // API 24+ only. Returns null if title is empty or style is null.
-   
+
   fun build(
     context: Context,
     title: CharSequence?,
-    // NEW: body text to render below the title (default styling)
+    //  body text to render below the title (default styling)
     body: CharSequence?,
     style: TitleStyle?
   ): RemoteViews? {
@@ -34,8 +34,9 @@ internal object TitleStyler {
     val rv = RemoteViews(context.packageName, R.layout.fln_notif_title_only)
     val titleId = R.id.fln_title
     val bodyId = R.id.fln_body
+    val rootId = R.id.fln_root
 
-    // 1) Build styled title (bold/italic via spans)
+    // Build styled title (bold/italic via spans)
     val styled: CharSequence = if ((style.bold == true) || (style.italic == true)) {
       val s = SpannableString(title)
       when {
@@ -65,7 +66,34 @@ internal object TitleStyler {
     // Set title last (ensures spans + color/size stick)
     rv.setTextViewText(titleId, styled)
 
-    // 2) Body/description (default appearance), only if provided
+// Adjust spacing between icon and text if requested (RTL-safe)
+style.iconSpacingDp?.let { spacing ->
+  if (spacing >= 0) {
+    val metrics = context.resources.displayMetrics
+    val startPx = TypedValue.applyDimension(
+      TypedValue.COMPLEX_UNIT_DIP,
+      spacing.toFloat(),
+      metrics
+    ).toInt()
+
+    // Defaults from resources (match XML)
+    val defaultStart = context.resources.getDimensionPixelSize(R.dimen.fln_padding_start)
+    val defaultTop = context.resources.getDimensionPixelSize(R.dimen.fln_padding_top)
+    val defaultEnd = context.resources.getDimensionPixelSize(R.dimen.fln_padding_end)
+    val defaultBottom = context.resources.getDimensionPixelSize(R.dimen.fln_padding_bottom)
+
+    val isRtl = context.resources.configuration.layoutDirection == View.LAYOUT_DIRECTION_RTL
+
+    val left = if (isRtl) defaultStart else startPx
+    val right = if (isRtl) startPx else defaultEnd
+
+    rv.setViewPadding(rootId, left, defaultTop, right, defaultBottom)
+  } else {
+    Log.d(TAG, "Ignoring negative iconSpacingDp: $spacing")
+  }
+}
+
+    // Body/description (default appearance), only if provided
     if (!body.isNullOrEmpty()) {
       rv.setViewVisibility(bodyId, View.VISIBLE)
       rv.setTextViewText(bodyId, body)

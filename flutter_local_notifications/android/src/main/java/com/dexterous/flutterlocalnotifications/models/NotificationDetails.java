@@ -262,6 +262,7 @@ public class NotificationDetails implements Serializable {
         Object s = m.get("sizeSp");
         Object b = m.get("bold");
         Object i = m.get("italic");
+        Object p = m.get("iconSpacingDp");
         if (c instanceof Number)
           ts.color = ((Number) c).intValue();
         if (s instanceof Number)
@@ -270,6 +271,8 @@ public class NotificationDetails implements Serializable {
           ts.bold = (Boolean) b;
         if (i instanceof Boolean)
           ts.italic = (Boolean) i;
+        if (p instanceof Number)
+          ts.iconSpacingDp = ((Number) p).doubleValue();
         notificationDetails.titleStyle = ts;
       }
       notificationDetails.autoCancel = (Boolean) platformChannelSpecifics.get(AUTO_CANCEL);

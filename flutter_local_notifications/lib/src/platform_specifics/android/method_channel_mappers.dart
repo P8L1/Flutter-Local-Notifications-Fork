@@ -81,6 +81,7 @@ extension AndroidNotificationTitleStyleMapper on AndroidNotificationTitleStyle {
         'sizeSp': sizeSp,
         'bold': bold,
         'italic': italic,
+        'iconSpacingDp': iconSpacing,
       };
 }
 

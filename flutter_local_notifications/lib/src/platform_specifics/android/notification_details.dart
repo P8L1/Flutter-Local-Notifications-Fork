@@ -114,8 +114,10 @@ class AndroidNotificationTitleStyle {
     this.sizeSp,
     this.bold,
     this.italic,
+    this.iconSpacing,
   })  : assert(sizeSp == null || sizeSp > 0),
-        assert(color == null || (color >= 0 && color <= 0xFFFFFFFF));
+        assert(color == null || (color >= 0 && color <= 0xFFFFFFFF)),
+        assert(iconSpacing == null || iconSpacing >= 0);
 
   /// 32-bit ARGB color (e.g., 0xFF58CC02). Null => platform default.
   final int? color;
@@ -128,6 +130,9 @@ class AndroidNotificationTitleStyle {
 
   /// Whether to render title in italic. Defaults to null (platform default).
   final bool? italic;
+
+  /// Distance in dp between the notification's icon and the title/body.
+  final double? iconSpacing;
 }
 
 /// Contains notification details specific to Android.
