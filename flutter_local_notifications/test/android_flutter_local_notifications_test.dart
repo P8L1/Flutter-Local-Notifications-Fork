@@ -62,9 +62,11 @@ void main() {
         const NotificationDetails(android: androidNotificationDetails),
       );
 
-      final Map<String, Object?> platformSpecifics =
-          (log.last.arguments as Map<String, Object?>)['platformSpecifics']
-              as Map<String, Object?>;
+      final Map<Object?, Object?> arguments =
+          log.last.arguments as Map<Object?, Object?>;
+      final Map<String, Object?> platformSpecifics = Map<String, Object?>.from(
+        arguments['platformSpecifics'] as Map<Object?, Object?>,
+      );
       expect(platformSpecifics['titleStyle'], <String, Object?>{
         'color': 0xFF58CC02,
         'sizeSp': 16,

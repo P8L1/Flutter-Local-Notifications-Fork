@@ -271,12 +271,6 @@ public class NotificationDetails implements Serializable {
         if (i instanceof Boolean)
           ts.italic = (Boolean) i;
         notificationDetails.titleStyle = ts;
-        android.util.Log.d(
-            "FLN-TitleStyle",
-            "READ titleStyle -> color=" + ts.color
-                + " sizeSp=" + ts.sizeSp
-                + " bold=" + ts.bold
-                + " italic=" + ts.italic);
       }
       notificationDetails.autoCancel = (Boolean) platformChannelSpecifics.get(AUTO_CANCEL);
       notificationDetails.ongoing = (Boolean) platformChannelSpecifics.get(ONGOING);

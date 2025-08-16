@@ -108,6 +108,15 @@ class AndroidNotificationAction {
 ///
 /// Effective on Android API 24+; ignored below that.
 class AndroidNotificationTitleStyle {
+  /// Constructs an instance of [AndroidNotificationTitleStyle].
+  const AndroidNotificationTitleStyle({
+    this.color,
+    this.sizeSp,
+    this.bold,
+    this.italic,
+  })  : assert(sizeSp == null || sizeSp > 0),
+        assert(color == null || (color >= 0 && color <= 0xFFFFFFFF));
+
   /// 32-bit ARGB color (e.g., 0xFF58CC02). Null => platform default.
   final int? color;
 
@@ -119,15 +128,6 @@ class AndroidNotificationTitleStyle {
 
   /// Whether to render title in italic. Defaults to null (platform default).
   final bool? italic;
-
-  /// Constructs an instance of [AndroidNotificationTitleStyle].
-  const AndroidNotificationTitleStyle({
-    this.color,
-    this.sizeSp,
-    this.bold,
-    this.italic,
-  })  : assert(sizeSp == null || sizeSp > 0),
-        assert(color == null || (color >= 0 && color <= 0xFFFFFFFF));
 }
 
 /// Contains notification details specific to Android.

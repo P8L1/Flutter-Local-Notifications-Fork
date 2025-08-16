@@ -425,11 +425,6 @@ public class FlutterLocalNotificationsPlugin
       builder.setShortcutId(notificationDetails.shortcutId);
     }
 
-    // if (!StringUtils.isNullOrEmpty(notificationDetails.subText)) {
-    // builder.setSubText(notificationDetails.subText);
-    // }
-    // In debug mode, NEVER set subText when using custom (prevents extra white
-    // line)
     if (customView == null && !StringUtils.isNullOrEmpty(notificationDetails.subText)) {
       builder.setSubText(notificationDetails.subText);
     }
@@ -449,25 +444,6 @@ public class FlutterLocalNotificationsPlugin
     if (customView == null) {
       setStyle(context, notificationDetails, builder);
     }
-    // if (customView != null) {
-    // builder.setCustomContentView(customView); // collapsed
-    // builder.setCustomBigContentView(customView); // expanded
-    // builder.setCustomHeadsUpContentView(customView);
-    // builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
-    // builder.setContentTitle((CharSequence) null); // explicitly clear
-    // builder.setContentText((CharSequence) null);
-
-    // } else {
-    // // Fallback to normal template
-    // builder.setContentTitle(
-    // defaultStyleInformation.htmlFormatTitle
-    // ? fromHtml(notificationDetails.title)
-    // : notificationDetails.title);
-    // builder.setContentText(
-    // defaultStyleInformation.htmlFormatBody
-    // ? fromHtml(notificationDetails.body)
-    // : notificationDetails.body);
-    // }
     if (customView != null) {
       // Attach our custom layout in ALL paths and suppress any system text
       builder.setCustomContentView(customView);
@@ -489,12 +465,6 @@ public class FlutterLocalNotificationsPlugin
               : notificationDetails.body);
     }
     Notification notification = builder.build();
-    // LOG which layouts Android actually attached
-    int cv = (notification.contentView != null) ? notification.contentView.getLayoutId() : -1;
-    int bcv = (notification.bigContentView != null) ? notification.bigContentView.getLayoutId() : -1;
-    int huv = (notification.headsUpContentView != null) ? notification.headsUpContentView.getLayoutId() : -1;
-    Log.d("FLN-TitleStyle", "LAYOUTS -> contentView=" + cv + " big=" + bcv + " headsUp=" + huv +
-        " (expect all == R.layout.fln_notif_title_only, i.e., " + R.layout.fln_notif_title_only + ")");
     if (notificationDetails.additionalFlags != null && notificationDetails.additionalFlags.length > 0) {
       for (int additionalFlag : notificationDetails.additionalFlags) {
         notification.flags |= additionalFlag;

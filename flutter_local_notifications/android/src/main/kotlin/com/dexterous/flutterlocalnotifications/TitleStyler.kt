@@ -17,10 +17,10 @@ internal object TitleStyler {
   private const val MAX_SIZE_SP = 26f
   private const val MIN_SIZE_SP = 8f
 
-  /**
-   * Builds a RemoteViews that renders a styled title (and optional body).
-   * API 24+ only. Returns null if title is empty or style is null.
-   */
+  
+    // Builds a RemoteViews that renders a styled title (and optional body).
+    // API 24+ only. Returns null if title is empty or style is null.
+   
   fun build(
     context: Context,
     title: CharSequence?,
@@ -73,8 +73,6 @@ internal object TitleStyler {
     } else {
       rv.setViewVisibility(bodyId, View.GONE)
     }
-
-    Log.d(TAG, "APPLY rv; color=${style.color?.toString(16)} size=${style.sizeSp} bold=${style.bold} italic=${style.italic}; bodyEmpty=${body.isNullOrEmpty()}")
     return rv
   }
 }
