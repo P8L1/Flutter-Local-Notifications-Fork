@@ -439,6 +439,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
               'actions': <Map<String, Object>>[
                 <String, Object>{
                   'id': 'action1',
@@ -567,6 +568,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -653,6 +655,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -740,6 +743,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -828,6 +832,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -920,6 +925,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1011,6 +1017,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1100,6 +1107,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1190,6 +1198,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1289,6 +1298,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1398,6 +1408,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1497,6 +1508,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1606,6 +1618,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1702,6 +1715,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1805,6 +1819,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1893,6 +1908,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -1984,6 +2000,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -2100,6 +2117,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -2229,6 +2247,7 @@ void main() {
               'number': null,
               'audioAttributesUsage': 5,
               'titleStyle': null,
+              'descriptionStyle': null,
             },
           }));
     });
@@ -2325,6 +2344,7 @@ void main() {
                     'number': null,
                     'audioAttributesUsage': 5,
                     'titleStyle': null,
+                    'descriptionStyle': null,
                   },
                 }));
           });
@@ -2461,6 +2481,7 @@ void main() {
                         'number': null,
                         'audioAttributesUsage': 5,
                         'titleStyle': null,
+                        'descriptionStyle': null,
                       },
                     }));
           });
@@ -2559,6 +2580,7 @@ void main() {
                 'number': null,
                 'audioAttributesUsage': 5,
                 'titleStyle': null,
+                'descriptionStyle': null,
               },
             }));
       });
@@ -2656,6 +2678,7 @@ void main() {
                 'number': null,
                 'audioAttributesUsage': 5,
                 'titleStyle': null,
+                'descriptionStyle': null,
               },
             }));
       });
@@ -2754,6 +2777,7 @@ void main() {
                 'number': null,
                 'audioAttributesUsage': 5,
                 'titleStyle': null,
+                'descriptionStyle': null,
               },
             }));
       });
@@ -3066,6 +3090,7 @@ void main() {
                   'number': null,
                   'audioAttributesUsage': 5,
                   'titleStyle': null,
+                  'descriptionStyle': null,
                 },
               },
               'startType': AndroidServiceStartType.startSticky.index,
