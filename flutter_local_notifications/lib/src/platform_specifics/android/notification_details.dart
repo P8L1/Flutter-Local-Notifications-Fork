@@ -122,7 +122,8 @@ class AndroidNotificationTitleStyle {
   /// 32-bit ARGB color (e.g., 0xFF58CC02). Null => platform default.
   final int? color;
 
-  /// Font size in SP (logical scaled pixels). Must be > 0.
+  /// Font size in SP (logical scaled pixels). Negative or zero values are
+  /// ignored on Android.
   final double? sizeSp;
 
   /// Whether to render title in bold. Defaults to null (platform default).

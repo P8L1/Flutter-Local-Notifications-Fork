@@ -76,13 +76,29 @@ extension AndroidNotificationChannelMapper on AndroidNotificationChannel {
 }
 
 extension AndroidNotificationTitleStyleMapper on AndroidNotificationTitleStyle {
-  Map<String, Object?> toMap() => <String, Object?>{
-        'color': color,
-        'sizeSp': sizeSp,
-        'bold': bold,
-        'italic': italic,
-        'iconSpacingDp': iconSpacing,
-      };
+  Map<String, Object?> toMap() {
+    final Map<String, Object?> map = <String, Object?>{};
+    if (color != null) {
+      assert(color! >= 0 && color! <= 0xFFFFFFFF);
+      map['color'] = color;
+    }
+    if (sizeSp != null) {
+      map['sizeSp'] = sizeSp;
+    }
+    if (bold != null) {
+      map['bold'] = bold;
+    }
+    if (italic != null) {
+      map['italic'] = italic;
+    }
+    if (iconSpacing != null) {
+      assert(iconSpacing! >= 0);
+      map['iconSpacingDp'] = iconSpacing;
+    }
+    assert(map.keys.toSet().length == map.length);
+    assert(map.values.every((Object? v) => v != null));
+    return map;
+  }
 }
 
 Map<String, Object> _convertNotificationSoundToMap(
